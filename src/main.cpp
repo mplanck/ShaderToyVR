@@ -11,15 +11,20 @@
 #define _USE_MATH_DEFINES 1
 
 #define GLEW_BUILD GLEW_STATIC
-#define GLFW_INCLUDE_GLU
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
 
 #pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glfw3.lib")
 
 #pragma comment(lib, "ws2_32.lib")
+
+#ifdef _DEBUG
 #pragma comment(lib, "libovrd.lib")
+#else
+#pragma comment(lib, "libovr.lib")
+#endif
+
+#pragma comment(lib, "glfw3.lib")
 #pragma comment(lib, "winmm.lib")
 
 // SYSTEM DEPENDENCIES
@@ -106,9 +111,9 @@ static HBGLOverlayStatsPtr            g_OverlayStats;
 static HBGLTextureResourcePtr         g_ChannelTextures[4];
 static GLfloat                        g_ChannelTimes[4] = { 0.f, 0.f, 0.f, 0.f };
 static GLfloat                        g_ChannelResolutions[4][3] = { { 0.f, 0.f, 0.f },
-{ 0.f, 0.f, 0.f },
-{ 0.f, 0.f, 0.f },
-{ 0.f, 0.f, 0.f } };
+                                                                     { 0.f, 0.f, 0.f },
+                                                                     { 0.f, 0.f, 0.f },
+                                                                     { 0.f, 0.f, 0.f } };
 static glm::vec4                      g_Date;
 
 static ovrHmd		                  g_HMD;
