@@ -8,7 +8,8 @@
 #include <cstdio>
 
 using namespace HBGLUtils;
-// #define HBGLSHADERS_DEBUG_INPUTSHADER
+
+//#define HBGLSHADERS_DEBUG_INPUTSHADER
 
 // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 // STATIC FUNCTIONS
@@ -765,12 +766,18 @@ HBGLShaderProgram::_GetUniformLocation(const GLchar* varname,
 
         m_boundUniformsMap[varname] = glGetUniformLocation(m_programIndex, varname);
         *index = (GLint) m_boundUniformsMap[varname];
-        return true;
 
     } else {
 
         *index = (GLint) bvIter->second;
+    }
+    if (*index >= 0)
+    {
         return true;
+    }
+    else
+    {
+        return false;
     }
 }
 

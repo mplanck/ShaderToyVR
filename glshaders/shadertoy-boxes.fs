@@ -41,7 +41,7 @@ vec4 texcube( sampler2D sam, in vec3 p, in vec3 n )
 	vec4 z = texture2D( sam, p.xy );
 	return x*abs(n.x) + y*abs(n.y) + z*abs(n.z);
 }
-
+ 
 //=====================================================================
 
 const mat3 m = mat3( 0.00,  0.80,  0.60,

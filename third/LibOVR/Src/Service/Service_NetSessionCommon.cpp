@@ -5,16 +5,16 @@ Content     :   Server for service interface
 Created     :   June 12, 2014
 Authors     :   Kevin Jenkins, Chris Taylor
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.1 
+http://www.oculusvr.com/licenses/LICENSE-3.2 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -155,6 +155,27 @@ void NetSessionCommon::SerializeHMDInfo(Net::BitStream *bitStream, HMDInfo* hmdI
 
     w = hmdInfo->FirmwareMinor;
     bitStream->Write(w);
+
+    bitStream->Write(hmdInfo->PelOffsetR.x);
+    bitStream->Write(hmdInfo->PelOffsetR.y);
+    bitStream->Write(hmdInfo->PelOffsetB.x);
+    bitStream->Write(hmdInfo->PelOffsetB.y);
+
+    // Important please read before modifying!
+    // ----------------------------------------------------
+    // Please add new serialized data to the end, here.
+    // Otherwise we will break backwards compatibility
+    // and e.g. 0.4.4 runtime will not work with 0.4.3 SDK.
+
+    // Please also update the DeserializeHMDInfo() function
+    // below also and make sure that the members you added
+    // are initialized properly in the HMDInfo constructor.
+
+    // Note that whenever new fields are added here you
+    // should also update the minor version of the RPC
+    // protocol in OVR_Session.h so that clients fail at
+    // a version check instead of when this data is
+    // found to be truncated from the server.
 }
 
 bool NetSessionCommon::DeserializeHMDInfo(Net::BitStream *bitStream, HMDInfo* hmdInfo)
@@ -243,6 +264,24 @@ bool NetSessionCommon::DeserializeHMDInfo(Net::BitStream *bitStream, HMDInfo* hm
     }
     hmdInfo->FirmwareMinor = w;
 
+    bitStream->Read(hmdInfo->PelOffsetR.x);
+    bitStream->Read(hmdInfo->PelOffsetR.y);
+    bitStream->Read(hmdInfo->PelOffsetB.x);
+    if (!bitStream->Read(hmdInfo->PelOffsetB.y))
+    {
+        OVR_ASSERT(false);
+        return false;
+    }
+
+    // Important please read before modifying!
+    // ----------------------------------------------------
+    // Please add new serialized data to the end, here.
+    // Otherwise we will break backwards compatibility
+    // and e.g. 0.4.4 runtime will not work with 0.4.3 SDK.
+
+    // Be sure to check that the very last one read properly
+    // since HMD Info truncation should be caught here.
+
     return true;
 }
 
@@ -253,13 +292,13 @@ static const char* KeyNames[][NetSessionCommon::ENumTypes] = {
     /* EGetStringValue */ { "CameraSerial", "CameraUUID", 0 },
     /* EGetBoolValue */ { "ReleaseDK2Sensors", "ReleaseLegacySensors", 0 },
     /* EGetIntValue */ { 0 },
-    /* EGetNumberValue */{ "CenterPupilDepth", 0 },
+    /* EGetNumberValue */{ "CenterPupilDepth", "LoggingMask", 0 },
     /* EGetNumberValues */{ "NeckModelVector3f", 0 },
     /* ESetStringValue */ { 0 },
     /* ESetBoolValue */ { "ReleaseDK2Sensors", "ReleaseLegacySensors", 0 },
     /* ESetIntValue */ { 0 },
-    /* ESetNumberValue */{ "CenterPupilDepth", 0 },
-    /* ESetNumberValues */{ "NeckModelVector3f", 0 }
+    /* ESetNumberValue */{ "CenterPupilDepth", "LoggingMask", 0 },
+    /* ESetNumberValues */{ "NeckModelVector3f", 0 },
 };
 
 bool IsInStringArray(const char* a[], const char* key)

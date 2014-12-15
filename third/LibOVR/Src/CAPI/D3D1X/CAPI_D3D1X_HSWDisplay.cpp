@@ -5,16 +5,16 @@ Content     :   Implements Health and Safety Warning system.
 Created     :   July 7, 2014
 Authors     :   Paul Pedriana
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.1 
+http://www.oculusvr.com/licenses/LICENSE-3.2 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ limitations under the License.
 #if defined(OVR_D3D_VERSION) && ((OVR_D3D_VERSION == 10) || (OVR_D3D_VERSION == 11))
 
 #define _WINSOCKAPI_             // Prevents <Windows.h> from #including <Winsock.h>, as we need the app to use <Winsock2.h> instead.
+#include "../../Kernel/OVR_Types.h"
 #include "../../OVR_CAPI_D3D.h"  // OVR_D3D_VERSION will have been defined by who included us.
 #include "CAPI_D3D1X_HSWDisplay.h"
 #include "../../Kernel/OVR_File.h"
@@ -38,10 +39,10 @@ limitations under the License.
 #include "../../Kernel/OVR_Color.h"
 
 // We currently borrow the SimpleQuad shaders
-#include "../Shaders/SimpleTexturedQuad_vs.h"
-#include "../Shaders/SimpleTexturedQuad_vs_refl.h"
-#include "../Shaders/SimpleTexturedQuad_ps.h"
-#include "../Shaders/SimpleTexturedQuad_ps_refl.h"
+#include "Shaders/SimpleTexturedQuad_vs.h"
+#include "Shaders/SimpleTexturedQuad_vs_refl.h"
+#include "Shaders/SimpleTexturedQuad_ps.h"
+#include "Shaders/SimpleTexturedQuad_ps_refl.h"
 
 
 /*
@@ -246,16 +247,18 @@ bool HSWDisplay::Initialize(const ovrRenderAPIConfig* apiConfig)
 
     if(config)
     {
-        RenderParams.pDevice	   = config->D3D_NS.pDevice;
-        #if (OVR_D3D_VERSION == 10)    
-        RenderParams.pContext      = config->D3D10.pDevice;
-        #else
-        RenderParams.pContext      = config->D3D11.pDeviceContext;
-        #endif
-        RenderParams.pBackBufferRT = config->D3D_NS.pBackBufferRT;
-        RenderParams.pSwapChain    = config->D3D_NS.pSwapChain;
-        RenderParams.RTSize        = config->D3D_NS.Header.RTSize;
-        RenderParams.Multisample   = config->D3D_NS.Header.Multisample;
+        RenderParams.pDevice	    = config->D3D_NS.pDevice;
+#if (OVR_D3D_VERSION == 10)
+        RenderParams.pContext       = config->D3D10.pDevice;
+        RenderParams.pBackBufferUAV = NULL;
+#else
+        RenderParams.pContext       = config->D3D11.pDeviceContext;
+        RenderParams.pBackBufferUAV = config->D3D_NS.pBackBufferUAV;
+#endif
+        RenderParams.pBackBufferRT  = config->D3D_NS.pBackBufferRT;
+        RenderParams.pSwapChain     = config->D3D_NS.pSwapChain;
+        RenderParams.BackBufferSize = config->D3D_NS.Header.BackBufferSize;
+        RenderParams.Multisample    = config->D3D_NS.Header.Multisample;
 
         // We may want to create RasterizerState, or alternatively let the DistortionRenderer handle it.
     }
@@ -527,7 +530,7 @@ void HSWDisplay::RenderInternal(ovrEyeType eye, const ovrTexture* eyeTexture)
             ShaderFill fill(pShaderSet);
             fill.SetInputLayout(pVertexInputLayout);
             if(pTexture)
-                fill.SetTexture(0, pTexture);
+                fill.SetTexture(0, pTexture, Shader_Pixel);
 
             const float scale  = HSWDISPLAY_SCALE * ((RenderState.OurHMDInfo.HmdType == HmdType_DK1) ? 0.70f : 1.f);
             pShaderSet->SetUniform2f("Scale", scale, scale / 2.f); // X and Y scale. Y is a fixed proportion to X in order to give a certain aspect ratio.

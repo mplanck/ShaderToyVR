@@ -14,14 +14,15 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #define GLFW_EXPOSE_NATIVE_WGL
 
-#pragma comment(lib, "opengl32.lib")
-
-#pragma comment(lib, "ws2_32.lib")
 
 #ifdef _DEBUG
 #pragma comment(lib, "libovrd.lib")
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "opengl32.lib")
 #else
 #pragma comment(lib, "libovr.lib")
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "opengl32.lib")
 #endif
 
 #pragma comment(lib, "glfw3.lib")
@@ -71,7 +72,7 @@ using namespace HBGLUtils;
 const bool c_DebugMode = true;
 const bool c_DebugModeRelink = false;
 
-const bool c_DebugWindowed = false;
+const bool c_DebugWindowed = true;
 
 const int c_SphGridNumLatSpans = 32;
 const int c_SphGridNumLongSpans = 32;
@@ -221,14 +222,13 @@ ShaderToyVRInitShaderSystem()
 
         // TODO: allow for reloading of the shader
 
-        HBGLShaderProgram* shprog = new HBGLShaderProgram("ShaderToyVR Sphere Quad Shader Program");
+        HBGLShaderProgram* shprog = new HBGLShaderProgram("ShaderToyVR Screen Quad Shader Program");
         g_ScreenQuadShaderProgram = HBGLShaderProgramPtr(shprog); // should flush any existing reference in the construction
 
         STVRVertexShader* vshader = new STVRVertexShader();
         HBGLShaderPtr stvrVertShader = HBGLShaderPtr(vshader);
 
         // TODO: make file searching better!
-
         STVRFragmentShader* fshader = new STVRFragmentShader("../glshaders/shadertoy.fs");
         HBGLShaderPtr stvrFragShader = HBGLShaderPtr(fshader);
 
@@ -575,7 +575,7 @@ ShaderToyVRLoadResources()
     HBGLShaderPtr fragShaderPtr = g_ScreenQuadShaderProgram->GetFragmentShader();
     const STVRFragmentShader* stvrFragShader = static_cast<STVRFragmentShader*>(&*fragShaderPtr);
 
-    for (uint inputChannel = SHADERTOYVR_CHANNEL_0; inputChannel < SHADERTOYVR_NUMCHANNELS; inputChannel += 1)
+    for (uint inputChannel = uint(SHADERTOYVR_CHANNEL_0); inputChannel < SHADERTOYVR_NUMCHANNELS; inputChannel++)
     {
         ShaderToyVRChannelType inputType = stvrFragShader->GetInputType(static_cast<ShaderToyVRInputChannel>(inputChannel));
 
@@ -636,20 +636,18 @@ ShaderToyVRInitOVR()
     ovr_Initialize();
 
     g_HMD = ovrHmd_Create(0);
-    if (g_HMD == nullptr)
+    if (g_HMD != nullptr)
     {
-        std::cerr << "ShaderToyVR ERROR: Could not find an HMD device.  Quitting" << std::endl;
-        ShaderToyVRErrorAndQuit();
+        g_OVRPositionalCamTanHalfFov[0] = tan(g_HMD->CameraFrustumHFovInRadians * .5f);
+        g_OVRPositionalCamTanHalfFov[1] = tan(g_HMD->CameraFrustumVFovInRadians * .5f);
     }
-
-    if (g_HMD)
+    else
     {
-//         g_OverlayStats->AddDataKey("Eye Yaw", 0.f);
-//         g_OverlayStats->AddDataKey("Eye Pitch", 0.f);
-//         g_OverlayStats->AddDataKey("Eye Roll", 0.f);
-//         g_OverlayStats->AddDataKey("Eye X", 0.f);
-//         g_OverlayStats->AddDataKey("Eye Y", 0.f);
-//         g_OverlayStats->AddDataKey("Eye Z", 0.f);
+        g_HMD = ovrHmd_CreateDebug(ovrHmd_DK2);
+        std::cerr << "ShaderToyVR ERROR: Could not find an HMD device.  Creating debug version." << std::endl;
+
+        g_OVRPositionalCamTanHalfFov[0] = tan(1.9 * .5f);
+        g_OVRPositionalCamTanHalfFov[1] = tan(1.9 * .5f);
     }
 
     ovrHmd_SetEnabledCaps(g_HMD, 
@@ -662,8 +660,6 @@ ShaderToyVRInitOVR()
         ovrTrackingCap_Position, 
         0);
 
-    g_OVRPositionalCamTanHalfFov[0] = tan(g_HMD->CameraFrustumHFovInRadians * .5f);
-    g_OVRPositionalCamTanHalfFov[1] = tan(g_HMD->CameraFrustumVFovInRadians * .5f);
     g_OVRStereoView = true;
 }
 
@@ -781,7 +777,7 @@ ShaderToyVRInitOVRGLSystem()
     ovrGLConfig cfg;
     memset(&cfg, 0, sizeof(ovrGLConfig));
     cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
-    cfg.OGL.Header.RTSize = g_HMD->Resolution;
+    cfg.OGL.Header.BackBufferSize = g_HMD->Resolution;
     cfg.OGL.Header.Multisample = 1; // <-- does this do anything??
     cfg.OGL.Window = glfwGetWin32Window(g_GLFWWindow);
     cfg.OGL.DC = wglGetCurrentDC();
@@ -802,7 +798,7 @@ ShaderToyVRInitOVRGLSystem()
         eye = static_cast<ovrEyeType>(eye + 1)) {
         
         g_OVRCamPerspective[eye] = FromOvrMatToMat(ovrMatrix4f_Projection(eyeFovPorts[eye], 0.1f, 4000.f, true));
-        g_OVRCamOffset[eye]      = FromOvrVecToVec(eyeRenderDescs[eye].ViewAdjust);
+        g_OVRCamOffset[eye] = FromOvrVecToVec(eyeRenderDescs[eye].HmdToEyeViewOffset);
     }
 
 }
@@ -899,25 +895,21 @@ ShaderToyVRDrawScreenQuad(const ovrEyeType& eye)
 
     // TODO: There is an unexplained INVALID VALUE error in the glUniform1i call in the below.
 
-    for (uint inputChannel = SHADERTOYVR_CHANNEL_0; 
+    for (uint inputChannel = uint(SHADERTOYVR_CHANNEL_0); 
         inputChannel < SHADERTOYVR_NUMCHANNELS; 
         inputChannel++)
     {
         GLuint texID = g_ChannelTextures[inputChannel]->GetIndex();
-
         if (texID > 0)
         {
             ShaderToyVRChannelType inputType = stvrFragShader->GetInputType(static_cast<ShaderToyVRInputChannel>(inputChannel));
-
-            const GLuint textureChannel = c_ChannelTextures[inputChannel];
-
-            glActiveTexture(textureChannel);
+            glActiveTexture(c_ChannelTextures[inputChannel]);
             glBindTexture(stvrFragShader->Is2DTexInput(inputType) ? GL_TEXTURE_2D : GL_TEXTURE_CUBE_MAP, texID);
 
             char channelBuffer[10];
             sprintf(channelBuffer, "iChannel%i", inputChannel);
 
-            g_ScreenQuadShaderProgram->SetUniform1i(channelBuffer, (GLint) textureChannel);
+            g_ScreenQuadShaderProgram->SetUniform1i(channelBuffer, inputChannel);
         }
 
     }
@@ -1056,7 +1048,7 @@ ShaderToyVRRenderScene(const ovrEyeType& eye)
     glMatrixMode(GL_MODELVIEW);
 
     glLoadIdentity();
-    glm::mat4 eyePose = FromOvrPoseToMat(ovrHmd_GetEyePose(g_HMD, eye));
+    glm::mat4 eyePose = FromOvrPoseToMat(ovrHmd_GetHmdPosePerEye(g_HMD, eye));
     glm::mat4 modelview_mat;
     if (g_OVRStereoView) {
         modelview_mat = glm::translate(modelview_mat, g_OVRCamOffset[eye]);
@@ -1146,7 +1138,7 @@ ShaderToyVRDraw(void)
     for (int i = 0; i < 2; i++)
     {
         ovrEyeType eye = g_HMD->EyeRenderOrder[i];
-        eyePoses[eye] = ovrHmd_GetEyePose(g_HMD, eye);
+        eyePoses[eye] = ovrHmd_GetHmdPosePerEye(g_HMD, eye);
 
         glBindFramebuffer(GL_FRAMEBUFFER, g_OVRFrameBuffer[eye]->GetIndex());
 
@@ -1389,13 +1381,16 @@ ShaderToyVRSetupViewWindow()
             c_DefaultWindowHeight, 
             "ShaderToyVR", NULL, NULL);
 
-#ifdef _DEBUG
-        // I use two monitors when developing, so my debug build puts the windowed version
-        // on my right monitor.
-        glfwSetWindowPos(g_GLFWWindow, 2600, 100);
-#else 
-        glfwSetWindowPos(g_GLFWWindow, 100, 100);
-#endif
+        if (c_DebugWindowed)
+        {
+            // I use two monitors when developing, so my debug build puts the windowed version
+            // on my right monitor.
+            glfwSetWindowPos(g_GLFWWindow, 2600, 100);
+        }
+        else
+        {
+            glfwSetWindowPos(g_GLFWWindow, 100, 100);
+        }
 
     }
 
@@ -1452,6 +1447,7 @@ main(int argc, char** argv){
 #endif
 
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
     glfwSetErrorCallback(ShaderToyVRGLFWErrorCallback);
 
     if (!glfwInit()) { 

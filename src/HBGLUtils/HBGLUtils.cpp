@@ -39,7 +39,7 @@ HBGLUtils::CheckGLError(const char *file, int line)
 	{
         result = false;
         //TODO: create a class that logs errors and only prints out "spamming" errors every 100 or so to avoid stdout spam
-        //std::cerr << "GL Error #" << glErr << " ( " << ParseGLError(glErr) << " ) in File " << file << " at line: " << line << std::endl;
+        std::cerr << "GL Error #" << glErr << " ( " << ParseGLError(glErr) << " ) in File " << file << " at line: " << line << std::endl;
 	}
 	return result;
 }

@@ -5,16 +5,16 @@ Content     :   Experimental distortion renderer
 Created     :   November 11, 2013
 Authors     :   Volga Aksoy
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.1 
+http://www.oculusvr.com/licenses/LICENSE-3.2 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,8 +56,7 @@ public:
 
     // ***** Public DistortionRenderer interface
 
-    virtual bool Initialize(const ovrRenderAPIConfig* apiConfig,
-                            unsigned distortionCaps);
+    virtual bool Initialize(const ovrRenderAPIConfig* apiConfig) OVR_OVERRIDE;
 
     virtual void SubmitEye(int eyeId, const ovrTexture* eyeTexture);
 
@@ -86,14 +85,22 @@ protected:
 		BOOL memoryCleared;
 
 		ID3D1xRasterizerState* rasterizerState;
-		ID3D1xSamplerState* samplerStates[D3D1x_COMMONSHADER_SAMPLER_SLOT_COUNT];
 		ID3D1xInputLayout* inputLayoutState;
 
-		ID3D1xShaderResourceView* psShaderResourceState[D3D1x_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
-		ID3D1xShaderResourceView* vsShaderResourceState[D3D1x_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+		ID3D1xShaderResourceView*   psShaderResourceState[D3D1x_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+		ID3D1xSamplerState*         psSamplerStates[D3D1x_COMMONSHADER_SAMPLER_SLOT_COUNT];
+		ID3D1xBuffer*               psConstantBuffersState[D3D1x_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
 
-		ID3D1xBuffer* psConstantBuffersState[D3D1x_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
-		ID3D1xBuffer* vsConstantBuffersState[D3D1x_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
+        ID3D1xShaderResourceView*   vsShaderResourceState[D3D1x_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+		ID3D1xSamplerState*         vsSamplerStates[D3D1x_COMMONSHADER_SAMPLER_SLOT_COUNT];
+		ID3D1xBuffer*               vsConstantBuffersState[D3D1x_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
+
+#if (OVR_D3D_VERSION == 11)
+        ID3D1xShaderResourceView*   csShaderResourceState[D3D1x_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT];
+		ID3D1xSamplerState*         csSamplerStates[D3D1x_COMMONSHADER_SAMPLER_SLOT_COUNT];
+		ID3D1xBuffer*               csConstantBuffersState[D3D1x_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT];
+		ID3D1xUnorderedAccessView*  csUnorderedAccessViewState[D3D1x_SIMULTANEOUS_RENDER_TARGET_COUNT];
+#endif
 
 		ID3D1xRenderTargetView* renderTargetViewState[D3D1x_SIMULTANEOUS_RENDER_TARGET_COUNT];
 		ID3D1xDepthStencilView* depthStencilViewState;
@@ -118,6 +125,7 @@ protected:
 #if (OVR_D3D_VERSION == 11)
 		ID3D11HullShader* currentHullShader;
 		ID3D11DomainShader* currentDomainShader;
+		ID3D11ComputeShader* currentComputeShader;
 #endif
 
 	};
@@ -148,8 +156,11 @@ private:
     ID3D1xSamplerState* getSamplerState(int sm);
 
     
-    // TBD: Should we be using oe from RState instead?
-    unsigned            DistortionCaps;
+    //// TBD: Should we be using oe from RState instead?
+    //unsigned            DistortionCaps;
+
+    // Back buffer is properly set as an SRGB format?
+    bool                SrgbBackBuffer;
 
     // D3DX device and utility variables.
     RenderParams        RParams;    
@@ -166,6 +177,7 @@ private:
 
 	Ptr<Buffer>         DistortionMeshVBs[2];    // one per-eye
 	Ptr<Buffer>         DistortionMeshIBs[2];    // one per-eye
+	Ptr<Buffer>         DistortionPinBuffer[2];  // one per-eye
 
 	Ptr<ShaderSet>      DistortionShader;
 	Ptr<ID3D1xInputLayout> DistortionVertexIL;

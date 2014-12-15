@@ -18,6 +18,7 @@ otherwise accompanies this software in either electronic or hard copy form.
 #ifndef OVR_dxgi_ovr_filter_h
 #define OVR_dxgi_ovr_filter_h
 
+#include <Windows.h>
 #include <InitGuid.h>
 
 #define USERMODE_TEST_ROTATION 1
@@ -145,6 +146,9 @@ typedef BOOL (WINAPI* PresentRiftOnContext)( PVOID );
 // 9 = DirectX 9
 // 10 = DirectX 1X
 typedef int (WINAPI* ActiveAPIVersion)( PVOID );
+
+// Get the version of the runtime filter.
+typedef ULONG (WINAPI* GetRTFilterVersion)();
 
 #pragma warning(push)
 #pragma warning(disable: 4201)
@@ -372,19 +376,31 @@ typedef struct _RIFT_STATUS_ARRAY
 
 // Enable or disable compatibility mode. Entering compatibility mode will fail if
 // the Rift is already actively scanning out a surface
-// Input Buffer: BOOL			- Nonzero if compatibility mode is desired, zero if it's not
+// Input Buffer: LONG			- Bit assignments:
+// LSB (bit 0) is a flag for compatibility mode itself.
+//      1 means compatibility mode.
+//      0 means application direct mode.
+// Bit 1 means "Hide DK1's".
+//      1 means operate DK1's in synchronous with the compatibility mode exactly.
+//      0 means operate in DK1 legacy mode.
 // Output Buffer: LONG			- Result value (see OVR statuses)
 //								   0 = success
 //								  -1 = general failure
 //								  -2 = failure, rift scanning out
+//                                -3 = already active
+//                                -4 = rift not present
 #define IOCTL_RIFTMGR_SETCOMPATIBILITYMODE CTL_CODE(FILE_DEVICE_VIDEO, \
 	FUNCTION_INDEX + 8, METHOD_NEITHER, FILE_ANY_ACCESS)
 
 // Call to obtain the current status of compatibility mode
 // Input Buffer: NOTHING
-// Output Buffer: LONG			- Result value 
-//								  0 = Not in compatibility mode
-//								  Non-zero = In compatibility mode
+// Output Buffer: LONG			- Bit assignments:
+// LSB (bit 0) is a flag for compatibility mode itself.
+//      1 means compatibility mode.
+//      0 means application direct mode.
+// Bit 1 means "Hide DK1's".
+//      1 means operate DK1's in synchronous with the compatibility mode exactly.
+//      0 means operate in DK1 legacy mode.
 #define IOCTL_RIFTMGR_GETCOMPATIBILITYMODE CTL_CODE(FILE_DEVICE_VIDEO, \
 	FUNCTION_INDEX + 9, METHOD_NEITHER, FILE_ANY_ACCESS)
 

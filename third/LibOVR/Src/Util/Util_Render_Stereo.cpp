@@ -5,18 +5,18 @@ Content     :   Stereo rendering configuration implementation
 Created     :   October 22, 2012
 Authors     :   Michael Antonov, Andrew Reisse, Tom Forsyth
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
-you may not use the Oculus VR Rift SDK except in compliance with the License, 
-which is provided at the time of installation or download, or which 
+Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License");
+you may not use the Oculus VR Rift SDK except in compliance with the License,
+which is provided at the time of installation or download, or which
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.1 
+http://www.oculusvr.com/licenses/LICENSE-3.2
 
-Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
+Unless required by applicable law or agreed to in writing, the Oculus VR SDK
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
@@ -38,21 +38,21 @@ char const* GetDebugNameEyeCupType ( EyeCupType eyeCupType )
 {
     switch ( eyeCupType )
     {
-    case EyeCup_DK1A:           return "DK1 A";             break;
-    case EyeCup_DK1B:           return "DK1 B";             break;
-    case EyeCup_DK1C:           return "DK1 C";             break;
-    case EyeCup_DKHD2A:         return "DKHD2 A";           break;
-    case EyeCup_OrangeA:        return "Orange A";          break;
-    case EyeCup_RedA:           return "Red A";             break;
-    case EyeCup_PinkA:          return "Pink A";            break;
-    case EyeCup_BlueA:          return "Blue A";            break;
-    case EyeCup_Delilah1A:      return "Delilah 1 A";       break;
-    case EyeCup_Delilah2A:      return "Delilah 2 A";       break;
-    case EyeCup_JamesA:         return "James A";           break;
-    case EyeCup_SunMandalaA:    return "Sun Mandala A";     break;
-    case EyeCup_DK2A:           return "DK2 A";             break;
-    case EyeCup_LAST:           return "LAST";              break;
-    default: OVR_ASSERT ( false ); return "Error"; break;
+    case EyeCup_DK1A:           return "DK1 A";
+    case EyeCup_DK1B:           return "DK1 B";
+    case EyeCup_DK1C:           return "DK1 C";
+    case EyeCup_DKHD2A:         return "DKHD2 A";
+    case EyeCup_OrangeA:        return "Orange A";
+    case EyeCup_RedA:           return "Red A";
+    case EyeCup_PinkA:          return "Pink A";
+    case EyeCup_BlueA:          return "Blue A";
+    case EyeCup_Delilah1A:      return "Delilah 1 A";
+    case EyeCup_Delilah2A:      return "Delilah 2 A";
+    case EyeCup_JamesA:         return "James A";
+    case EyeCup_SunMandalaA:    return "Sun Mandala A";
+    case EyeCup_DK2A:           return "DK2 A";
+    case EyeCup_LAST:           return "LAST";
+    default: OVR_ASSERT ( false ); return "Error";
     }
 }
 
@@ -60,17 +60,17 @@ char const* GetDebugNameHmdType ( HmdTypeEnum hmdType )
 {
     switch ( hmdType )
     {
-    case HmdType_None:              return "None";                   break;
-    case HmdType_DK1:               return "DK1";                    break;
-    case HmdType_DKProto:           return "DK1 prototype";          break;
-    case HmdType_DKHDProto:         return "DK HD prototype 1";      break;
-    case HmdType_DKHDProto566Mi:    return "DK HD prototype 566 Mi"; break;
-    case HmdType_DKHD2Proto:        return "DK HD prototype 585";    break;
-    case HmdType_CrystalCoveProto:  return "Crystal Cove";           break;
-    case HmdType_DK2:               return "DK2";                    break;
-    case HmdType_Unknown:           return "Unknown";                break;
-    case HmdType_LAST:              return "LAST";                   break;
-    default: OVR_ASSERT ( false ); return "Error"; break;
+    case HmdType_None:              return "None";
+    case HmdType_DK1:               return "DK1";
+    case HmdType_DKProto:           return "DK1 prototype";
+    case HmdType_DKHDProto:         return "DK HD prototype 1";
+    case HmdType_DKHDProto566Mi:    return "DK HD prototype 566 Mi";
+    case HmdType_DKHD2Proto:        return "DK HD prototype 585";
+    case HmdType_CrystalCoveProto:  return "Crystal Cove";
+    case HmdType_DK2:               return "DK2";
+    case HmdType_Unknown:           return "Unknown";
+    case HmdType_LAST:              return "LAST";
+    default: OVR_ASSERT ( false ); return "Error";
     }
 }
 
@@ -81,7 +81,7 @@ char const* GetDebugNameHmdType ( HmdTypeEnum hmdType )
 struct DistortionAndFov
 {
     DistortionRenderDesc    Distortion;
-    FovPort                 Fov; 
+    FovPort                 Fov;
 };
 
 static DistortionAndFov CalculateDistortionAndFovInternal ( StereoEye eyeType, HmdRenderInfo const &hmd,
@@ -199,14 +199,14 @@ static StereoEyeParams CalculateStereoEyeParamsInternal ( StereoEye eyeType, Hmd
     // this is the mapping of actual physical eye FOV (and our eyes do not zoom!)
     // to screen space.
     ScaleAndOffset2D eyeToSourceNDC = CreateNDCScaleAndOffsetFromFov ( fov );
-    
+
     // The size of the final FB, which is fixed and determined by the physical size of the device display.
     Recti distortedViewport   = GetFramebufferViewport ( eyeType, hmd );
     Vector3f virtualCameraOffset = CalculateEyeVirtualCameraOffset(hmd, eyeType, bMonoRenderingMode);
 
     StereoEyeParams result;
     result.Eye                  = eyeType;
-    result.ViewAdjust           = Matrix4f::Translation(virtualCameraOffset);
+    result.HmdToEyeViewOffset   = Matrix4f::Translation(virtualCameraOffset);
     result.Distortion           = distortion;
     result.DistortionViewport   = distortedViewport;
     result.Fov                  = fov;
@@ -373,6 +373,8 @@ StereoConfig::StereoConfig(StereoMode mode)
     Hmd.ResolutionInPixels                              = Sizei(1280, 800);
     Hmd.ScreenSizeInMeters                              = Sizef(0.1498f, 0.0936f);
     Hmd.ScreenGapSizeInMeters                           = 0.0f;
+    Hmd.PelOffsetR                                      = Vector2f ( 0.0f, 0.0f );
+    Hmd.PelOffsetB                                      = Vector2f ( 0.0f, 0.0f );
     Hmd.CenterFromTopInMeters                           = 0.0468f;
     Hmd.LensSeparationInMeters                          = 0.0635f;
     Hmd.LensDiameterInMeters                            = 0.035f;
@@ -545,8 +547,10 @@ void StereoConfig::UpdateComputedState()
         eyeTypes[1]     = StereoEye_Right;
         break;
 
-    default:        
-        OVR_ASSERT( false ); break;
+    default:
+        numEyes = 0;
+        OVR_ASSERT( false );
+        break;
     }
 
     // If either of these fire, you've probably forgotten to call SetRendertargetSize()
@@ -788,6 +792,99 @@ static const int DMA_NumTrisPerEye  = (DMA_GridSize)*(DMA_GridSize)*2;
 
 
 
+DistortionMeshVertexData DistortionMeshMakeVertex ( Vector2f screenNDC,
+                                                    bool rightEye,
+                                                    const HmdRenderInfo &hmdRenderInfo,
+                                                    const DistortionRenderDesc &distortion, const ScaleAndOffset2D &eyeToSourceNDC )
+{
+    DistortionMeshVertexData result;
+
+    float xOffset = 0.0f;
+    if (rightEye)
+    {
+        xOffset = 1.0f;
+    }
+
+    Vector2f tanEyeAnglesR, tanEyeAnglesG, tanEyeAnglesB;
+    TransformScreenNDCToTanFovSpaceChroma ( &tanEyeAnglesR, &tanEyeAnglesG, &tanEyeAnglesB,
+                                            distortion, screenNDC );
+
+	result.TanEyeAnglesR = tanEyeAnglesR;
+	result.TanEyeAnglesG = tanEyeAnglesG;
+	result.TanEyeAnglesB = tanEyeAnglesB;
+
+    HmdShutterTypeEnum shutterType = hmdRenderInfo.Shutter.Type;
+    switch ( shutterType )
+    {
+    case HmdShutter_Global:
+        result.TimewarpLerp = 0.0f;
+        break;
+    case HmdShutter_RollingLeftToRight:
+        // Retrace is left to right - left eye goes 0.0 -> 0.5, then right goes 0.5 -> 1.0
+        result.TimewarpLerp = screenNDC.x * 0.25f + 0.25f;
+        if (rightEye)
+        {
+            result.TimewarpLerp += 0.5f;
+        }
+        break;
+    case HmdShutter_RollingRightToLeft:
+        // Retrace is right to left - right eye goes 0.0 -> 0.5, then left goes 0.5 -> 1.0
+        result.TimewarpLerp = 0.75f - screenNDC.x * 0.25f;
+        if (rightEye)
+        {
+            result.TimewarpLerp -= 0.5f;
+        }
+        break;
+    case HmdShutter_RollingTopToBottom:
+        // Retrace is top to bottom on both eyes at the same time.
+        result.TimewarpLerp = screenNDC.y * 0.5f + 0.5f;
+        break;
+    default: OVR_ASSERT ( false ); break;
+    }
+
+    // When does the fade-to-black edge start? Chosen heuristically.
+    float fadeOutBorderFractionTexture = 0.1f;
+    float fadeOutBorderFractionTextureInnerEdge = 0.1f;
+    float fadeOutBorderFractionScreen = 0.1f;
+    float fadeOutFloor = 0.6f;        // the floor controls how much black is in the fade region
+
+    if (hmdRenderInfo.HmdType == HmdType_DK1)
+    {
+        fadeOutBorderFractionTexture = 0.3f;
+        fadeOutBorderFractionTextureInnerEdge = 0.075f;
+        fadeOutBorderFractionScreen = 0.075f;
+        fadeOutFloor = 0.25f;
+    }
+
+    // Fade out at texture edges.
+    // The furthest out will be the blue channel, because of chromatic aberration (true of any standard lens)
+    Vector2f sourceTexCoordBlueNDC = TransformTanFovSpaceToRendertargetNDC ( eyeToSourceNDC, tanEyeAnglesB );
+	if (rightEye)
+	{
+		// The inner edge of the eye texture is usually much more magnified, because it's right against the middle of the screen, not the FOV edge.
+		// So we want a different scaling factor for that. This code flips the texture NDC so that +1.0 is the inner edge
+		sourceTexCoordBlueNDC.x = -sourceTexCoordBlueNDC.x;
+	}
+    float edgeFadeIn               = ( 1.0f / fadeOutBorderFractionTextureInnerEdge ) * ( 1.0f - sourceTexCoordBlueNDC.x )  ;   // Inner
+    edgeFadeIn       = Alg::Min ( edgeFadeIn, ( 1.0f / fadeOutBorderFractionTexture ) * ( 1.0f + sourceTexCoordBlueNDC.x ) );   // Outer
+    edgeFadeIn       = Alg::Min ( edgeFadeIn, ( 1.0f / fadeOutBorderFractionTexture ) * ( 1.0f - sourceTexCoordBlueNDC.y ) );   // Upper
+    edgeFadeIn       = Alg::Min ( edgeFadeIn, ( 1.0f / fadeOutBorderFractionTexture ) * ( 1.0f + sourceTexCoordBlueNDC.y ) );   // Lower
+
+    // Also fade out at screen edges. Since this is in pixel space, no need to do inner specially.
+    float edgeFadeInScreen = ( 1.0f / fadeOutBorderFractionScreen ) *
+                             ( 1.0f - Alg::Max ( Alg::Abs ( screenNDC.x ), Alg::Abs ( screenNDC.y ) ) );
+    edgeFadeIn = Alg::Min ( edgeFadeInScreen, edgeFadeIn ) + fadeOutFloor;
+
+	// Note - this is NOT clamped negatively.
+	// For rendering methods that interpolate over a coarse grid, we need the values to go negative for correct intersection with zero.
+    result.Shade = Alg::Min ( edgeFadeIn, 1.0f );
+    result.ScreenPosNDC.x = 0.5f * screenNDC.x - 0.5f + xOffset;
+    result.ScreenPosNDC.y = -screenNDC.y;
+
+    return result;
+}
+
+
 void DistortionMeshDestroy ( DistortionMeshVertexData *pVertices, uint16_t *pTriangleMeshIndices )
 {
     OVR_FREE ( pVertices );
@@ -805,7 +902,7 @@ void DistortionMeshCreate ( DistortionMeshVertexData **ppVertices, uint16_t **pp
     // Generate mesh into allocated data and return result.
     DistortionMeshCreate(ppVertices, ppTriangleListIndices, &vertexCount, &triangleCount,
                          rightEye, hmdRenderInfo, stereoParams.Distortion, stereoParams.EyeToSourceNDC);
-    
+
     *pNumVertices  = vertexCount;
     *pNumTriangles = triangleCount;
 }
@@ -815,7 +912,7 @@ void DistortionMeshCreate ( DistortionMeshVertexData **ppVertices, uint16_t **pp
 void DistortionMeshCreate( DistortionMeshVertexData **ppVertices, uint16_t **ppTriangleListIndices,
                            int *pNumVertices, int *pNumTriangles,
                            bool rightEye,
-                           const HmdRenderInfo &hmdRenderInfo, 
+                           const HmdRenderInfo &hmdRenderInfo,
                            const DistortionRenderDesc &distortion, const ScaleAndOffset2D &eyeToSourceNDC )
 {
     *pNumVertices  = DMA_NumVertsPerEye;
@@ -842,20 +939,9 @@ void DistortionMeshCreate( DistortionMeshVertexData **ppVertices, uint16_t **ppT
         return;
     }
 
-    // When does the fade-to-black edge start? Chosen heuristically.
-    const float fadeOutBorderFraction = 0.075f;
-      
-    
-    // Populate vertex buffer info
-    float xOffset = 0.0f;
-    float uOffset = 0.0f;
-    OVR_UNUSED(uOffset);
 
-    if (rightEye)
-    {
-        xOffset = 1.0f;
-        uOffset = 0.5f;
-    }
+
+    // Populate vertex buffer info
 
     // First pass - build up raw vertex data.
     DistortionMeshVertexData* pcurVert = *ppVertices;
@@ -879,65 +965,14 @@ void DistortionMeshCreate( DistortionMeshVertexData **ppVertices, uint16_t **ppT
             screenNDC.x = Alg::Max ( -1.0f, Alg::Min ( screenNDC.x, 1.0f ) );
             screenNDC.y = Alg::Max ( -1.0f, Alg::Min ( screenNDC.y, 1.0f ) );
 
-            // From those screen positions, we then need (effectively) RGB UVs.
-            // This is the function that actually matters when doing the distortion calculation.
-            Vector2f tanEyeAnglesR, tanEyeAnglesG, tanEyeAnglesB;
-            TransformScreenNDCToTanFovSpaceChroma ( &tanEyeAnglesR, &tanEyeAnglesG, &tanEyeAnglesB,
-                                                    distortion, screenNDC );
-			
-			pcurVert->TanEyeAnglesR = tanEyeAnglesR;
-			pcurVert->TanEyeAnglesG = tanEyeAnglesG;
-			pcurVert->TanEyeAnglesB = tanEyeAnglesB;
-			
-            HmdShutterTypeEnum shutterType = hmdRenderInfo.Shutter.Type;
-            switch ( shutterType )
-            {
-            case HmdShutter_Global:
-                pcurVert->TimewarpLerp = 0.0f;
-                break;
-            case HmdShutter_RollingLeftToRight:
-                // Retrace is left to right - left eye goes 0.0 -> 0.5, then right goes 0.5 -> 1.0
-                pcurVert->TimewarpLerp = screenNDC.x * 0.25f + 0.25f;
-                if (rightEye)
-                {
-                    pcurVert->TimewarpLerp += 0.5f;
-                }
-                break;
-            case HmdShutter_RollingRightToLeft:
-                // Retrace is right to left - right eye goes 0.0 -> 0.5, then left goes 0.5 -> 1.0
-                pcurVert->TimewarpLerp = 0.75f - screenNDC.x * 0.25f;
-                if (rightEye)
-                {
-                    pcurVert->TimewarpLerp -= 0.5f;
-                }
-                break;
-            case HmdShutter_RollingTopToBottom:
-                // Retrace is top to bottom on both eyes at the same time.
-                pcurVert->TimewarpLerp = screenNDC.y * 0.5f + 0.5f;
-                break;
-            default: OVR_ASSERT ( false ); break;
-            }
-
-            // Fade out at texture edges.
-            // The furthest out will be the blue channel, because of chromatic aberration (true of any standard lens)
-            Vector2f sourceTexCoordBlueNDC = TransformTanFovSpaceToRendertargetNDC ( eyeToSourceNDC, tanEyeAnglesB );
-            float edgeFadeIn       = ( 1.0f / fadeOutBorderFraction ) *
-                                     ( 1.0f - Alg::Max ( Alg::Abs ( sourceTexCoordBlueNDC.x ), Alg::Abs ( sourceTexCoordBlueNDC.y ) ) );
-            // Also fade out at screen edges.
-            float edgeFadeInScreen = ( 2.0f / fadeOutBorderFraction ) *
-                                     ( 1.0f - Alg::Max ( Alg::Abs ( screenNDC.x ), Alg::Abs ( screenNDC.y ) ) );
-            edgeFadeIn = Alg::Min ( edgeFadeInScreen, edgeFadeIn );
-
-            pcurVert->Shade = Alg::Max ( 0.0f, Alg::Min ( edgeFadeIn, 1.0f ) );
-            pcurVert->ScreenPosNDC.x = 0.5f * screenNDC.x - 0.5f + xOffset;
-            pcurVert->ScreenPosNDC.y = -screenNDC.y;
-
+            // From those screen positions, generate the vertex.
+            *pcurVert = DistortionMeshMakeVertex ( screenNDC, rightEye, hmdRenderInfo, distortion, eyeToSourceNDC );
             pcurVert++;
         }
     }
 
 
-    // Populate index buffer info  
+    // Populate index buffer info
     uint16_t *pcurIndex = *ppTriangleListIndices;
 
     for ( int triNum = 0; triNum < DMA_GridSize * DMA_GridSize; triNum++ )
@@ -1069,14 +1104,7 @@ void HeightmapMeshCreate( HeightmapMeshVertexData **ppVertices, uint16_t **ppTri
     }
 
     // Populate vertex buffer info
-    float xOffset = 0.0f;
-    float uOffset = 0.0f;
-
-    if (rightEye)
-    {
-        xOffset = 1.0f;
-        uOffset = 0.5f;
-    }
+    // float xOffset = (rightEye ? 1.0f : 0.0f);  Currently disabled because its usage is disabled below.
 
     // First pass - build up raw vertex data.
     HeightmapMeshVertexData* pcurVert = *ppVertices;
@@ -1090,7 +1118,7 @@ void HeightmapMeshCreate( HeightmapMeshVertexData **ppVertices, uint16_t **ppTri
             sourceCoordNDC.x = 2.0f * ( (float)x / (float)HMA_GridSize ) - 1.0f;
             sourceCoordNDC.y = 2.0f * ( (float)y / (float)HMA_GridSize ) - 1.0f;
             Vector2f tanEyeAngle = TransformRendertargetNDCToTanFovSpace ( eyeToSourceNDC, sourceCoordNDC );
-            
+
             pcurVert->TanEyeAngles = tanEyeAngle;
 
             HmdShutterTypeEnum shutterType = hmdRenderInfo.Shutter.Type;
@@ -1135,7 +1163,7 @@ void HeightmapMeshCreate( HeightmapMeshVertexData **ppVertices, uint16_t **ppTri
     }
 
 
-    // Populate index buffer info  
+    // Populate index buffer info
     uint16_t *pcurIndex = *ppTriangleListIndices;
 
     for ( int triNum = 0; triNum < HMA_GridSize * HMA_GridSize; triNum++ )
@@ -1275,10 +1303,10 @@ PredictionValues PredictionGetDeviceValues ( const HmdRenderInfo &hmdRenderInfo,
     return result;
 }
 
-Matrix4f TimewarpComputePoseDelta ( Matrix4f const &renderedViewFromWorld, Matrix4f const &predictedViewFromWorld, Matrix4f const&eyeViewAdjust )
+Matrix4f TimewarpComputePoseDelta ( Matrix4f const &renderedViewFromWorld, Matrix4f const &predictedViewFromWorld, Matrix4f const&hmdToEyeViewOffset )
 {
-    Matrix4f worldFromPredictedView = (eyeViewAdjust * predictedViewFromWorld).InvertedHomogeneousTransform();
-    Matrix4f matRenderFromNowStart = (eyeViewAdjust * renderedViewFromWorld) * worldFromPredictedView;
+    Matrix4f worldFromPredictedView = (hmdToEyeViewOffset * predictedViewFromWorld).InvertedHomogeneousTransform();
+    Matrix4f matRenderFromNowStart = (hmdToEyeViewOffset * renderedViewFromWorld) * worldFromPredictedView;
 
     // The sensor-predicted orientations have:                           X=right, Y=up,   Z=backwards.
     // The vectors inside the mesh are in NDC to keep the shader simple: X=right, Y=down, Z=forwards.
@@ -1309,22 +1337,35 @@ Matrix4f TimewarpComputePoseDelta ( Matrix4f const &renderedViewFromWorld, Matri
     return matRenderFromNowStart;
 }
 
-Matrix4f TimewarpComputePoseDeltaPosition ( Matrix4f const &renderedViewFromWorld, Matrix4f const &predictedViewFromWorld, Matrix4f const&eyeViewAdjust )
+Matrix4f TimewarpComputePoseDeltaPosition ( Matrix4f const &renderedViewFromWorld, Matrix4f const &predictedViewFromWorld, Matrix4f const&hmdToEyeViewOffset )
 {
-    Matrix4f worldFromPredictedView = (eyeViewAdjust * predictedViewFromWorld).InvertedHomogeneousTransform();
-    Matrix4f matRenderXform = (eyeViewAdjust * renderedViewFromWorld) * worldFromPredictedView;
+    Matrix4f worldFromPredictedView = (hmdToEyeViewOffset * predictedViewFromWorld).InvertedHomogeneousTransform();
+    Matrix4f matRenderXform = (hmdToEyeViewOffset * renderedViewFromWorld) * worldFromPredictedView;
 
     return matRenderXform.Inverted();
 }
 
 TimewarpMachine::TimewarpMachine()
-{    
+  : VsyncEnabled(false),
+    RenderInfo(),
+    CurrentPredictionValues(),
+    DistortionTimeCount(0),
+    DistortionTimeCurrentStart(0.0),
+  //DistortionTimes[],
+    DistortionTimeAverage(0.f),
+  //EyeRenderPoses[],
+    LastFramePresentFlushTime(0.0),
+    PresentFlushToPresentFlushSeconds(0.f),
+    NextFramePresentFlushTime(0.0)
+{
+    #if defined(OVR_BUILD_DEBUG)
+        memset(DistortionTimes, 0, sizeof(DistortionTimes));
+    #endif
+
     for ( int i = 0; i < 2; i++ )
     {
         EyeRenderPoses[i] = Posef();
     }
-    DistortionTimeCount = 0;
-    VsyncEnabled = false;
 }
 
 void TimewarpMachine::Reset(HmdRenderInfo& renderInfo, bool vsyncEnabled, double timeNow)
@@ -1341,10 +1382,26 @@ void TimewarpMachine::Reset(HmdRenderInfo& renderInfo, bool vsyncEnabled, double
 
 void TimewarpMachine::AfterPresentAndFlush(double timeNow)
 {
+    AfterPresentWithoutFlush();
+    AfterPresentFinishes ( timeNow );
+}
+
+void TimewarpMachine::AfterPresentWithoutFlush()
+{
+    // We've only issued the Present - it hasn't actually finished (i.e. appeared)
+    // But we need to estimate when the next Present will appear, so extrapolate from previous data.
+    NextFramePresentFlushTime = LastFramePresentFlushTime + 2.0 * (double)PresentFlushToPresentFlushSeconds;
+}
+
+void TimewarpMachine::AfterPresentFinishes(double timeNow)
+{
+    // The present has now actually happened.
     PresentFlushToPresentFlushSeconds = (float)(timeNow - LastFramePresentFlushTime);
     LastFramePresentFlushTime = timeNow;
     NextFramePresentFlushTime = timeNow + (double)PresentFlushToPresentFlushSeconds;
 }
+
+
 
 double TimewarpMachine::GetViewRenderPredictionTime()
 {
@@ -1416,19 +1473,30 @@ double  TimewarpMachine::JustInTime_GetDistortionWaitUntilTime()
         return LastFramePresentFlushTime;
     }
 
-    const float fudgeFactor = 0.002f;      // Found heuristically - 1ms is too short because of timing granularity - may need further tweaking!
-    float howLongBeforePresent = DistortionTimeAverage + fudgeFactor;
+    // Note - 1-2ms fudge factor (because Windows timer granularity etc) is NOT added here,
+    // because otherwise you end up adding multiple fudge factors!
+    // So it's left for the calling app to add just one fudge factor.
+
+    float howLongBeforePresent = DistortionTimeAverage;
     // Subtlety here. Technically, the correct time is NextFramePresentFlushTime - howLongBeforePresent.
     // However, if the app drops a frame, this then perpetuates it,
     // i.e. if the display is running at 60fps, but the last frame was slow,
     // (e.g. because of swapping or whatever), then NextFramePresentFlushTime is
-    // 33ms in the future, not 16ms. Since this function supplies the 
+    // 33ms in the future, not 16ms. Since this function supplies the
     // time to wait until, the app will indeed wait until 32ms, so the framerate
     // drops to 30fps and never comes back up!
     // So we return the *ideal* framerate, not the *actual* framerate.
     return LastFramePresentFlushTime + (float)( CurrentPredictionValues.PresentFlushToPresentFlush - howLongBeforePresent );
 }
 
+double TimewarpMachine::JustInTime_AverageDistortionTime()
+{
+    if ( JustInTime_NeedDistortionTimeMeasurement() )
+    {
+        return 0.0;
+    }
+    return DistortionTimeAverage;
+}
 
 bool    TimewarpMachine::JustInTime_NeedDistortionTimeMeasurement() const
 {

@@ -30,16 +30,16 @@ Notes       :
   THE SOFTWARE.
 
 
-Copyright   :   Copyright 2014 Oculus VR, Inc. All Rights reserved.
+Copyright   :   Copyright 2014 Oculus VR, LLC All Rights reserved.
 
-Licensed under the Oculus VR Rift SDK License Version 3.1 (the "License"); 
+Licensed under the Oculus VR Rift SDK License Version 3.2 (the "License"); 
 you may not use the Oculus VR Rift SDK except in compliance with the License, 
 which is provided at the time of installation or download, or which 
 otherwise accompanies this software in either electronic or hard copy form.
 
 You may obtain a copy of the License at
 
-http://www.oculusvr.com/licenses/LICENSE-3.1 
+http://www.oculusvr.com/licenses/LICENSE-3.2 
 
 Unless required by applicable law or agreed to in writing, the Oculus VR SDK 
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,6 +59,10 @@ limitations under the License.
 #include "OVR_JSON.h"
 #include "Kernel/OVR_SysFile.h"
 #include "Kernel/OVR_Log.h"
+
+#ifdef OVR_OS_LINUX
+#include <locale.h>
+#endif
 
 namespace OVR {
 
@@ -157,8 +161,17 @@ const char* JSON::parseNumber(const char *num)
     int         subscale     = 0,
                 signsubscale = 1;
     bool positiveSign = true;
+    char localeSeparator = '.';
 
-	// Could use sscanf for this?
+#ifdef OVR_OS_LINUX
+    // We should switch to a locale aware parsing function, such as atof. We
+    // will probably want to go farther and enforce the 'C' locale on all JSON
+    // output/input.
+    struct lconv* localeConv = localeconv();
+    localeSeparator = localeConv->decimal_point[0];
+#endif
+
+    // Could use sscanf for this?
     if (*num == '-')
     {
         positiveSign = false;
@@ -178,7 +191,7 @@ const char* JSON::parseNumber(const char *num)
         while (*num>='0' && *num<='9');	// Number?
     }
 
-	if (*num=='.' && num[1]>='0' && num[1]<='9')
+    if ((*num=='.' || *num==localeSeparator) && num[1]>='0' && num[1]<='9')
     {
         num++;
         do
@@ -337,9 +350,13 @@ const char* JSON::parseString(const char* str, const char** perror)
 					switch (len)
                     {
 						case 4: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
+							//no break, fall through
 						case 3: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
+							//no break
 						case 2: *--ptr2 =((uc | 0x80) & 0xBF); uc >>= 6;
+							//no break
 						case 1: *--ptr2 = (char)(uc | firstByteMark[len]);
+							//no break
 					}
 					ptr2+=len;
 					break;

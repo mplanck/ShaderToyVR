@@ -16,7 +16,7 @@
 // ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 static const char* STVRVertexShaderString =
-"#version 120\n"
+"#version 130\n"
 
 "in vec2 position;\n"
 
@@ -80,7 +80,7 @@ STVRVertexShader::LoadSource(const std::string& programSource)
 // ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 static const char* STVRFragmentShaderHeader =
-"#version 120\n"
+"#version 130\n"
 
 "uniform float     iGlobalTime;\n"
 "uniform vec2      iMouse;\n"
@@ -387,6 +387,7 @@ STVRFragmentShader::LoadFile(const std::string& filePath)
                     const char* inputHeaderTemplate = STVRFragmentShaderChannelHeader[inputIter->first];
 
                     char inputHeader[64];
+                    //sprintf_s(inputHeader, inputHeaderTemplate, Is2DTexInput(inputIter->second) ? "sampler2D" : "samplerCube");
                     sprintf_s(inputHeader, inputHeaderTemplate, Is2DTexInput(inputIter->second) ? "sampler2D" : "samplerCube");
                     memcpy(&m_shaderSource[shaderCharIdx], inputHeader, strlen(inputHeader));
                     shaderCharIdx += strlen(inputHeader);
@@ -513,7 +514,7 @@ STVRFragmentShader::LoadSource(const std::string& programSource)
 static const char* STVRDebugGridVertexShaderString =
 "#version 130\n"
 
-"varying vec4 texcoord;\n"
+"out vec4 texcoord;\n"
 
 "void main()\n"
 "{\n"
@@ -576,7 +577,7 @@ static const char* STVRDebugGridFragmentShaderString =
 "#version 130\n"
 
 "uniform vec2 grid_dims;\n"
-"varying vec4 texcoord;\n"
+"in vec4 texcoord;\n"
 
 "#define PI 3.14\n\n"
 
