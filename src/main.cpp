@@ -72,7 +72,7 @@ using namespace HBGLUtils;
 const bool c_DebugMode = true;
 const bool c_DebugModeRelink = false;
 
-const bool c_DebugWindowed = true;
+const bool c_DebugWindowed = false;
 
 const int c_SphGridNumLatSpans = 32;
 const int c_SphGridNumLongSpans = 32;

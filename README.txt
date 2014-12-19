@@ -3,9 +3,11 @@ ShaderToyVR User Guide
 
 ShaderToy VR converts toys that use a ray marching/ray casting approach which
 calculate a camera origin (aka ro) and a camera ray direction (aka rd) per
-pixel.  Most toy's construct ro and rd using a pin-hole camera model.  They do
-so by calculating an orthonormal basis for the camera, and then use that to map
-pixel coordinates to a ray direction.  The code often looks like this:
+pixel into an Oculus Rift DK2 compatible experiences.  
+
+Most toy's construct ro and rd using  a pin-hole camera model.  They do so by
+calculating an orthonormal basis for the camera, and then use that to map pixel
+coordinates to a ray direction.   The code often looks like this:
 
 ...
 
@@ -105,8 +107,8 @@ the Rift position:
     ro += camXform[3].xyz; // <-- to capture stereo viewing, you'll need 
                            // account for the eye offset
 
-    float fl = 1.5; // <-- often need to adjust the focal length until it feels
-                    // right - use the sphere grid to calibrate
+    float fl = iFocalLength; // <-- often need to adjust the focal length until it feels
+                             // right - use the sphere grid to calibrate
 
     vec3 rd = normalize( p.x*camXform[0].xyz + p.y*camXform[1].xyz + fl * camXform[2].xyz );
 ...
@@ -123,7 +125,7 @@ good value by bringing up the experience and then displaying the "sphere grid"
 with the 'g' key.  I try to find a value so that the toy experience feels as
 grounded as the sphere when moving my head.  Right now, you can tweak the
 uniform variable iFocalLength that the can be changed with the <COMMA> and
-<PERIOD> keys.  I'm soon going  to have a proper print out so you can record the
+<PERIOD> keys.  I'm soon going to have a proper print out so you can record the
 final iFocalLength that works.
 
 Toys that modify the camera model by warping p or vignetting the focal length
